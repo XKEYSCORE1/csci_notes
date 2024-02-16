@@ -141,11 +141,11 @@ void playGame(int* playerScore, int* opponentScore) {
         if (opponentChoice == 2 || opponentChoice == 3){ 
           // rock vs. scissors or lizard = Win
 
-          cout << "******************************" << endl;
-					cout << "Rock beats Scissors or Lizard!" << endl;
-					cout << "--------------------------------" << endl;
+
+          cout << "Rock beats Scissors or Lizard!" << endl;
+          cout << "--------------------------------" << endl;
           cout << "You win!" << endl;
-          cout << "******************************\n" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
 
           (*playerScore)++; // dereference the pointer and increment the value
 
@@ -154,39 +154,39 @@ void playGame(int* playerScore, int* opponentScore) {
         else if (opponentChoice == 0){
           // rock vs. rock = Tie
 
-					cout << "******************************" << endl;
-					cout << "Rock ties with Rock!" << endl;
-					cout << "--------------------------------" << endl;
+
+          cout << "Rock ties with Rock!" << endl;
+          cout << "--------------------------------" << endl;
           cout << "Tie!" << endl;
-          cout << "******************************\n" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
 
         }
         else {
           // rock vs. paper or spock = Loss
 
-          cout << "******************************" << endl;
-					cout << "Rock loses to Paper or Spock!" << endl;
-					cout << "--------------------------------" << endl;
+
+          cout << "Rock loses to Paper or Spock!" << endl;
+          cout << "--------------------------------" << endl;
           cout << "You lose!" << endl; 
-          cout << "******************************\n" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
 
           (*opponentScore)++; // dereference the pointer and increment the value
 
         }
 
         break;
-        
+
       case 1: 
         // paper
 
         if (opponentChoice == 3 || opponentChoice == 4){ 
           // paper vs. lizard or spock = Win
 
-          cout << "******************************" << endl;
-					cout << "Paper beats Lizard or Spock!" << endl;
-					cout << "--------------------------------" << endl;
+
+          cout << "Paper beats Lizard or Spock!" << endl;
+          cout << "--------------------------------" << endl;
           cout << "You win!" << endl; 
-          cout << "******************************\n" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
 
           (*playerScore)++; // dereference the pointer and increment the value
 
@@ -195,25 +195,25 @@ void playGame(int* playerScore, int* opponentScore) {
         else if (opponentChoice == 1){ 
           // paper vs. paper = Tie
 
-          cout << "******************************" << endl;
-					cout << "Paper ties with Paper!" << endl;
-					cout << "--------------------------------" << endl;
+
+          cout << "Paper ties with Paper!" << endl;
+          cout << "--------------------------------" << endl;
           cout << "Tie!" << endl;
-          cout << "******************************\n" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
 
         }
 
         else { // paper vs. rock or scissors = Loss
 
-          cout << "******************************" << endl;
-					cout << "Paper loses to Rock or Scissors!" << endl;
-					cout << "--------------------------------" << endl;
+
+          cout << "Paper loses to Rock or Scissors!" << endl;
+          cout << "--------------------------------" << endl;
           cout << "You lose!" << endl; 
-          cout << "******************************\n" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
 
           (*opponentScore)++;  // dereference the pointer and increment the value      
 
-				}
+        }
 
         break;
 
@@ -223,68 +223,74 @@ void playGame(int* playerScore, int* opponentScore) {
         if (opponentChoice == 0 || opponentChoice == 4){ 
           // scissors vs. rock or spock = Win
 
-          cout << "******************************" << endl;
-					cout << "Scissors beats Rock or Spock!" << endl;
-					cout << "--------------------------------" << endl;
-          cout << "You win!" << endl;
-          cout << "******************************\n" << endl;
 
-					(*playerScore)++;  // dereference the pointer and increment the value
+          cout << "Scissors beats Rock or Spock!" << endl;
+          cout << "--------------------------------" << endl;
+          cout << "You win!" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
+
+
+          (*playerScore)++;  // dereference the pointer and increment the value
 
         }
 
         else if (opponentChoice == 2){ 
           // scissors vs. scissors = Tie
 
-          cout << "******************************" << endl;
-					cout << "Scissors ties with Scissors!" << endl;
-					cout << "--------------------------------" << endl;
+
+          cout << "Scissors ties with Scissors!" << endl;
+          cout << "--------------------------------" << endl;
           cout << "Tie!" << endl;
-          cout << "******************************\n" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
+
 
         }
         else { 
           // scissors vs. paper or lizard = Loss
 
-          cout << "******************************" << endl;
-					cout << "Scissors loses to Paper or Lizard!" << endl;
-					cout << "--------------------------------" << endl;
+
+          cout << "Scissors loses to Paper or Lizard!" << endl;
+          cout << "--------------------------------" << endl;
           cout << "You lose!" << endl; 
-          cout << "******************************\n" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
+
 
           (*opponentScore)++; // dereference the pointer and increment the value    
-				}
+        }
         break;
       case 3: 
         // lizard
         if (opponentChoice == 0 || opponentChoice == 2){ 
           // lizard vs. rock or scissors = Win
-          cout << "******************************" << endl;
-					cout << "Lizard beats Rock or Scissors!\n" << endl;
-					cout << "--------------------------------" << endl;
+
+          cout << "Lizard beats Rock or Scissors!" << endl;
+          cout << "--------------------------------" << endl;
           cout << "You win!" << endl;
-          cout << "******************************\n" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
+
 
           (*playerScore)++; // dereference the pointer and increment the value
         }
         else if (opponentChoice == 3){ 
           // lizard vs. lizard = Tie
-          cout << "******************************" << endl;
-					cout << "Lizard ties with Lizard!" << endl;
-					cout << "--------------------------------" << endl;
+
+          cout << "Lizard ties with Lizard!" << endl;
+          cout << "--------------------------------" << endl;
           cout << "Tie!" << endl;
-          cout << "******************************\n" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
+
         }
         else { 
           // lizard vs. paper or spock = Loss
-          cout << "******************************" << endl;
-					cout << "Lizard loses to Paper or Spock!" << endl;
-					cout << "--------------------------------" << endl;
-          cout << "You lose!" << endl; 
-          cout << "******************************\n" << endl;
 
+          cout << "Lizard loses to Paper or Spock!" << endl;
+          cout << "--------------------------------" << endl;
+          cout << "You lose!" << endl; 
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
+
+          
           (*opponentScore)++; // dereference the pointer and increment the value  
-				}
+        }
 
         break;
 
@@ -293,49 +299,53 @@ void playGame(int* playerScore, int* opponentScore) {
 
         if (opponentChoice == 1 || opponentChoice == 3){ 
           // spock vs. paper or lizard = Win
-          cout << "******************************" << endl;
-					cout << "Spock beats Paper or Lizard!" << endl;
-					cout << "--------------------------------" << endl;
+
+          cout << "Spock beats Paper or Lizard!" << endl;
+          cout << "--------------------------------" << endl;
           cout << "You win!" << endl;
-          cout << "******************************\n" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
 
           (*playerScore)++; // dereference the pointer and increment the value
 
+          
         }
 
         else if (opponentChoice == 4){ 
           // spock vs. spock = Tie
 
-          cout << "******************************" << endl;
-					cout << "Spock ties with Spock!" << endl;
-					cout << "--------------------------------" << endl;
-          cout << "Tie!" << endl;
-          cout << "******************************\n" << endl;
 
+          cout << "Spock ties with Spock!" << endl;
+          cout << "--------------------------------" << endl;
+          cout << "Tie!" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
+
+          
         }
 
         else { 
           // spock vs. rock or scissors = Loss
 
-          cout << "******************************" << endl;
-					cout << "Spock loses to Rock or Scissors!" << endl;
-					cout << "--------------------------------" << endl;
+
+          cout << "Spock loses to Rock or Scissors!" << endl;
+          cout << "--------------------------------" << endl;
           cout << "You lose!" << endl; 
-          cout << "******************************\n" << endl;
+          cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
 
           (*opponentScore)++;  // dereference the pointer and increment the value  
+
           
-				}
+        }
         break;
 
       default: 
         // invalid choice
 
-        cout << "******************************" << endl;
-				cout << "Invalid choice!" << endl;
-				cout << "--------------------------------" << endl;
+
+        cout << "Invalid choice!" << endl;
+        cout << "--------------------------------" << endl;
         cout << "Please only use numbers 1-5" << endl;
-        cout << "******************************\n" << endl; 
+        cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" << endl;
+        round--; // give user another chance to enter a valid choice
 
         break;
 
