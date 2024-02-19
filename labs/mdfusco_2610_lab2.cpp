@@ -35,8 +35,6 @@ void showRules() {
   return;
 }
 
-
-
 void playGame(int* playerScore, int* opponentScore) {
   // delegate game logic and user input handling to a separate function
     // declare the player and opponent scores as pointers 
@@ -424,7 +422,6 @@ int main(){
 
 
 
-
     do { 
       // call the showRules() function and the playGame() + finalResults() functions with parameters
 
@@ -448,10 +445,8 @@ int main(){
           cin >> replay; 
           // store the user's input
 
-
           if (replay != 'y' && replay != 'Y' && replay != 'n' && replay != 'N') {
           // Input validation (while y/Y/n/N is not entered, prompt the user again)
-
             cout << "Invalid input. Please enter 'y' or 'n': "; 
           }
 
