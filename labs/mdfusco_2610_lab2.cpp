@@ -61,7 +61,7 @@ void playGame(int* playerScore, int* opponentScore) {
 
 
     do {
-      // loop to get and validate the user's input
+      // do-while loop to get and validate the user's input
 
       for (int i = 0; i < 5; i++) {
       // for i in [0, 5) -> loop to display choices
@@ -349,12 +349,11 @@ void playGame(int* playerScore, int* opponentScore) {
 
         break;
 
-    }
+    } // switch ends here 
 
 
     // display the round's score
     cout << "*********Round Score**********\n" << "Player score: " << *playerScore  << endl;
-
     cout  << "Opponent score: " << *opponentScore << "\n******************************\n" << endl;
 
 
@@ -441,9 +440,9 @@ int main(){
         finalResults(&playerScore, &opponentScore); 
           // Displays the final results (passes playerScore and opponentScore by reference)
 
-        cout << "Play again? (y/n): "; // prompt to user play again
+        cout << "Play again? (y/n): "; 
+        // prompt to user play again
         
-
 
         do { 
           cin >> replay; 
@@ -459,11 +458,12 @@ int main(){
 
         } while (replay != 'y' && replay != 'Y' && replay != 'n' && replay != 'N');
           // loop the prompt until the user enters a valid input
+            // if not (y/Y) and if not (n/N), loop again
     
 
 
     } while (replay == 'y' || replay == 'Y'); 
-    // loop the game's main menu if the user wants to play again
+    // loop the game's main menu if the user wants to play again (inputs y or Y)
 
 
 
