@@ -107,6 +107,8 @@ struct Hand{
 };
 
 
+
+
 Hand createHand(string owner){
 	Hand h;
 	h.owner = owner;
@@ -149,8 +151,8 @@ Hand addCard(Hand h, Card c){
 
 
 Hand dealCard(Hand h, Deck d){
-	int i = d.currentCard;
-	// cout << h.owner << "'s hand pre-deal: ";
+
+    // cout << h.owner << "'s hand pre-deal: ";
 	// printHand(h);
 	// cout << "DEBUG: About to deal: " << d.card[i].value << d.card[i].suit << endl;
 	h = addCard(h, d.card[d.currentCard]);
@@ -283,11 +285,14 @@ void dealCards(Hand& dealerHand, Hand& player1Hand, Deck& deck) {
     deck.currentCard++;
 }
 
-// Function to print the hands of all players
+
+
+// Function to print the hands of all players, and display the dealer's hole card if the revealHoleCard parameter is true
 void printAllHands(const Hand& dealerHand, const Hand& player1Hand) {
     printHand(player1Hand);
-    cout << "dealer cards: ?? " << dealerHand.card[1].value + dealerHand.card[1].suit << endl;
-    // Additional printing logic for other players if needed
+    printHand(dealerHand);
+    
+    // TODO: Additional printing logic for other players 
 }
 
 
@@ -322,14 +327,8 @@ int main() {
                 if (choice == "hit") {
                     player1Hand = dealCard(player1Hand, deck);
                     deck.currentCard++;
-                    printAllHands(dealerHand, player1Hand);
+                    printAllHands(player1Hand, dealerHand);
                 }
-            }
-
-            // Dealer's turn
-            while (eval(dealerHand) <= 16) {
-                dealerHand = dealCard(dealerHand, deck);
-                deck.currentCard++;
             }
 
             // Print final hands
