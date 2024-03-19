@@ -24,13 +24,12 @@ struct Deck{
 	Card card[52];
 };
 
-void shuffleDeck( Deck d ){
+void shuffleDeck( Deck& d ){
     srand(time(0));
     for (int i = 0; i < 52; i++) {
         int j = i + rand() % (52 - i);
         swap(d.card[i], d.card[j]);
     }
-    return;
 }
 
 Deck create_deck(){
@@ -60,6 +59,45 @@ Deck create_deck(){
 	return deck;	
 }
 
+// function to replace the card suits in the deck
+Card suitReplace(Card c){
+    if (c.suit == "S"){
+        c.suit = "♠";
+    }
+    else if (c.suit == "H"){
+        c.suit = "♥";
+    }
+    else if (c.suit == "C"){
+        c.suit = "♣";
+    }
+    else if (c.suit == "D"){
+        c.suit = "♦";
+    }
+    else if (c.suit == "♠"){
+        // do nothing
+    }
+    else if (c.suit == "♥"){
+        // do nothing
+    }
+    else if (c.suit == "♣"){
+        // do nothing
+    }
+    else if (c.suit == "♦"){
+        // do nothing
+    }
+    else {
+        std::cout << "ERROR: invalid suit value in card: " << c.value << c.suit << endl;
+    }
+    return c;
+}
+
+// function to replace the card suits in the deck
+void replaceCardSuits(Deck& deck){
+    for (int i = 0; i < 52; i++){
+        deck.card[i] = suitReplace(deck.card[i]);
+        cout << deck.card[i].value << deck.card[i].suit << endl;     
+    }
+}
 
 struct Hand{
 	string owner;
@@ -124,24 +162,6 @@ Hand dealCard(Hand h, Deck d){
 }
 
 
-// TODO: replace the cards suits in the deck with the symbols
-// METHOD 1 - use a function that swaps out the value of the card suit.
-Card suitReplace(Card c){
-	if (c.suit == "S"){
-		c.suit = "â™ ";
-	}else if (c.suit == "H"){
-		c.suit = "â™¥";
-	}
-	else if (c.suit == "C"){
-		c.suit = "â™£";
-	}
-	else if (c.suit == "D"){
-		c.suit = "â™¦";
-	}else{
-		std::cout << "ERROR: invalid suit value in card: " << c.value << c.suit << endl;
-	}
-	return c;
-}
 
 
 // TODO: Evaluate the hand, including Aces being worth 11 or 1 (if necessary)
@@ -202,13 +222,13 @@ int eval( Hand h ){
 
             
 	// DEBUG: Print the cardVal map -- comment this out in your program 
-	// cout << "\nThe map is:\n"; 
-	// cout << "KEY\tVALUE\n";
-	// for (const auto& [key, value] : cardMap){
-	// 	cout << key << ":\t" << value << " points\n";
-	// }
+    // cout << "\nThe map is:\n"; 
+    // cout << "KEY\tVALUE\n";
+    //     for (const auto& [key, value] : cardMap){
+    //          cout << key << ":\t" << value << " points\n";
+     //   }
 
-	printHand(h);
+//	printHand(h);
 
 	// for each card in the hand, add the score:
 	for(int n=0; n < h.numCards; n++){
@@ -225,7 +245,7 @@ int eval( Hand h ){
 	return score;
 };
 
-
+// function to print the deck
 void printDeck(Deck d){
     for(int i=0; i<52; i++){
         std::cout << d.card[i].value << d.card[i].suit;
@@ -236,84 +256,122 @@ void printDeck(Deck d){
 
 
 
-void replaceCardSuits(Deck deck){
-    for (int i = 0; i < 52; i++){
-        deck.card[i] = suitReplace(deck.card[i]);
-                    // cout << deck.card[i].value << deck.card[i].suit << endl;     
-    }
+// Function to create hands for the dealer and players
+void createHands(Hand& dealerHand, Hand& player1Hand) {
+    dealerHand = createHand("Dealer");
+    player1Hand = createHand("Player 1");
 }
-//TODO: (optional) replace card letters with symbols
-	// Method 2: don't do method 1 above, make the deck in create_deck using the suit symbols
-	// Example:
-	// string suitSymbols[] = {"â™£", "â™¦", "â™¥", "â™ "};
-	// for (auto n : suitSymbols){ // the initializer may be an array
-	// 	cout << n << endl;
-	// }
-	// cout << endl;
 
-    // cout << "\nDEBUG: current card: " << deck.currentCard << endl;
+// Function to create and shuffle the deck
+Deck createAndShuffleDeck() {
+    Deck deck = create_deck();
+    replaceCardSuits(deck); // replace the card suits in the deck before shuffling
+
+    shuffleDeck(deck);
+    return deck;
+}
+
+// Function to deal cards to the players and the dealer
+void dealCards(Hand& dealerHand, Hand& player1Hand, Deck& deck) {
+    player1Hand = dealCard(player1Hand, deck);
+    deck.currentCard++;
+    dealerHand = dealCard(dealerHand, deck);
+    deck.currentCard++;
+    player1Hand = dealCard(player1Hand, deck);
+    deck.currentCard++;
+    dealerHand = dealCard(dealerHand, deck);
+    deck.currentCard++;
+}
+
+// Function to print the hands of all players
+void printAllHands(const Hand& dealerHand, const Hand& player1Hand) {
+    printHand(player1Hand);
+    cout << "dealer cards: ?? " << dealerHand.card[1].value + dealerHand.card[1].suit << endl;
+    // Additional printing logic for other players if needed
+}
 
 
 // === MAIN === 
-int main(){
-// There are zero cards when you declare a new Hand.
-// hand dealerHand, player1Hand;
-    Hand dealerHand = createHand("Dealer");
-    Hand player1Hand = createHand("Player 1");
-// player2Hand, player3Hand;
-    Deck deck = create_deck();
-// iterate through the deck and replace the card letters with symbols
-    for (int i = 0; i < 52; i++){
-        deck.card[i] = suitReplace(deck.card[i]);
-                 // cout << deck.card[i].value << deck.card[i].suit << endl;
-    }
-// swap the cards in the deck around to randomize the order.
-    shuffleDeck(deck);
-        // DEBUG:
-        // cout << "Shuffled deck: ", printDeck() << endl;
-        //  cout << "first item: " << deck[0] << endl;
-// TODO: Deal cards out from the deck to make hand
-    // The player gets dealt the first card.
-    player1Hand = dealCard(player1Hand, deck);
-    // increment the position (how many cards deep in the deck)
-    deck.currentCard++;
-	// cout << "DEBUG: back in main() from dealCard." << endl;
-	// printHand(player1Hand);
-	// cout << "DEBUG: Current number of cards dealt (deck list index): " << deck.currentCard << endl;
+int main() {
+    // Game state loop
+    bool playAgain = true;
+    do {
+        Deck deck;
+        deck = createAndShuffleDeck();
+        Hand dealerHand;
+        Hand player1Hand;
+        createHands(dealerHand, player1Hand);
+        dealCards(dealerHand, player1Hand, deck);
 
-	dealerHand = dealCard(dealerHand, deck);
-	// increment the position (how many cards deep in the deck)
-	deck.currentCard++;
-	// cout << "DEBUG: back in main() from dealCard." << endl;
-	// printHand(dealerHand);
-	// cout << "DEBUG: Current number of cards dealt (deck list index): " << deck.currentCard << endl;
+        // Print initial hands
+        printAllHands(dealerHand, player1Hand);
 
-	// The player gets dealt the first card.
-	player1Hand = dealCard(player1Hand, deck);
-	// increment the position (how many cards deep in the deck)
-	deck.currentCard++;
-	// cout << "DEBUG: back in main() from dealCard." << endl;
-	// printHand(player1Hand);
-	// cout << "DEBUG: Current number of cards dealt (deck list index): " << deck.currentCard << endl;
+        // Check for Blackjack condition
+        if (eval(player1Hand) == 21 && eval(dealerHand) != 21) {
+            cout << "Player 1 wins with Blackjack!" << endl;
+        } else if (eval(dealerHand) == 21 && eval(player1Hand) != 21) {
+            cout << "Dealer wins with Blackjack!" << endl;
+        } else if (eval(dealerHand) == 21 && eval(player1Hand) == 21) {
+            cout << "It's a tie with Blackjack!" << endl;
+        } else {
+            // Player's turn
+            string choice;
+            while (choice != "stand" && eval(player1Hand) < 21) {
+                cout << "Player 1, do you want to hit or stand? ";
+                cin >> choice;
+                if (choice == "hit") {
+                    player1Hand = dealCard(player1Hand, deck);
+                    deck.currentCard++;
+                    printAllHands(dealerHand, player1Hand);
+                }
+            }
 
-	dealerHand = dealCard(dealerHand, deck);
-	// increment the position (how many cards deep in the deck)
-	deck.currentCard++;
-	// cout << "DEBUG: back in main() from dealCard." << endl;
-	// printHand(dealerHand);
-	// cout << "DEBUG: Current number of cards dealt (deck list index): " << deck.currentCard << endl;
+            // Dealer's turn
+            while (eval(dealerHand) <= 16) {
+                dealerHand = dealCard(dealerHand, deck);
+                deck.currentCard++;
+            }
+
+            // Print final hands
+            printAllHands(dealerHand, player1Hand);
+
+            // Evaluate hands and determine the winner
+            int player1Score = eval(player1Hand);
+            int dealerScore = eval(dealerHand);
+            if (player1Score > 21) {
+                cout << "Player 1 busts! Dealer wins." << endl;
+            } else if (dealerScore > 21) {
+                cout << "Dealer busts! Player 1 wins." << endl;
+            } else if (player1Score > dealerScore) {
+                cout << "Player 1 wins!" << endl;
+            } else if (player1Score < dealerScore) {
+                cout << "Dealer wins!" << endl;
+            } else {
+                cout << "It's a tie!" << endl;
+            }
+        }
+
+        // Ask if the player wants to play again
+        cout << "Do you want to play again? (yes/no) ";
+        string playAgainChoice;
+        cin >> playAgainChoice;
+        if (playAgainChoice == "no" || playAgainChoice == "n"|| playAgainChoice == "No" || playAgainChoice == "NO" || playAgainChoice == "N") {
+            playAgain = false;
+        }
+        else if (playAgainChoice == "yes" || playAgainChoice == "y"|| playAgainChoice == "Yes" || playAgainChoice == "YES" || playAgainChoice == "Y") {
+            playAgain = true;
+        }
+        else {
+            cout << "Invalid input. Please enter yes or no." << endl;
+            playAgain = false;
+        }
+    } while (playAgain==true);
+
+    return 0;
+}
+
 
 	// TODO: print out hand of all players
-    // print out the player's hand:
-	printHand(player1Hand);
-	// print out the dealer's hand, hiding the hole card:
-	cout << "dealer cards: ?? " << dealerHand.card[1].value + dealerHand.card[1].suit << endl;
-	// subsequent printing will require a function in the case that the dealer hits (on a hand < 16).	
-
-	cout << "DEBUG In main(): " << player1Hand.owner << "'s hand value: " << eval(player1Hand) << endl;
-	cout << "DEBUG In main(): " << dealerHand.owner << "'s hand value: " << eval(dealerHand) << endl;
-
-
 	// TODO: Check for a Blackjack condition.  The game ends if any player (or the dealer) was dealt Blackjack.
 	// If the Dealer has Blackjack and a Player doesn't, the game is over and every Player loses.
 	// It's a PUSH (tie) if the Player has one as well, nobody "wins"
@@ -323,7 +381,3 @@ int main(){
 	// TODO: The dealer takes the last turn, and has an opportunity to hit repeatedly (on a hand <= 16, but must stand on a 17 or above).
 	// TODO: Keep track of Player and Dealer wins, losses and ties
 	// TODO: Put the entire game in a play again (game state loop) -- each hand is one round of a larger game. 
-
-
-	return 0;
-};
