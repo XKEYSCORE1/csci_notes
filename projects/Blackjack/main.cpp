@@ -183,6 +183,7 @@ struct Hand
 
 };
 
+
 void drawFromDeck(Hand& h, Deck& deck) 
 {
     Card drawnCard = deck.drawCard(); 
@@ -222,7 +223,6 @@ void createHands(Hand& dealerHand, Hand& player1Hand)
 
 
 // Function to deal cards to the players and the dealer
-
 void dealCards(Hand& dealerHand, Hand& player1Hand, Deck& deck) 
 {
     player1Hand = dealCard(player1Hand, deck);
@@ -231,7 +231,7 @@ void dealCards(Hand& dealerHand, Hand& player1Hand, Deck& deck)
     dealerHand = dealCard(dealerHand, deck);
 }
 
-
+// function to print the dealer's hand
 void printDealerHand(const Hand& dealerHand, bool revealHoleCard)
 {
     if (revealHoleCard == true) 
@@ -391,7 +391,8 @@ void playRound(Deck& deck, Hand& dealerHand, Hand& player1Hand)
 
 
 //* ======= MAIN ======= *//
-
+// TODO: Keep track of Player and Dealer wins, losses and ties
+ // TODO: Additional  logic for other players 
 
 
 int main() 
@@ -417,5 +418,4 @@ int main()
 
 } // end main
 
-	// TODO: Keep track of Player and Dealer wins, losses and ties
-    // TODO: Additional  logic for other players 
+	
