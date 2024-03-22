@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <cstdlib>
 #include <ctime>
 #include <string>
@@ -66,7 +67,7 @@ struct Deck
             cout << card[i].value << card[i].suit;
             if (i != 51) cout << ", ";
         }
-        cout << endl;
+        std::cout << endl;
     }
 
     // Function to draw a card from the deck
@@ -134,7 +135,7 @@ struct Hand
             numCards++;
 
             // DEBUG: Print the hand size
-            cout << "DEBUG: " << owner << "'s hand size: " << numCards << endl;
+            //std::cout << "DEBUG: " << owner << "'s hand size: " << numCards << endl;
         }
     }
 
@@ -183,7 +184,45 @@ struct Hand
 
 };
 
+// struct to represent the game stats
+struct GameStats
+{
+    int playerWins = 0;
+    int dealerWins = 0;
+    int ties = 0;
 
+    void printStats() const
+    {
+
+        // Calculate the rounds played
+        int totalRounds = playerWins + dealerWins + ties;
+        double playerWinPercent, houseWinPercent, tiePercent;
+         // Calculate the percentage of wins for each player
+        if (totalRounds > 0)
+        {
+            playerWinPercent = (static_cast<double>(playerWins) / totalRounds) * 100;
+            houseWinPercent = (static_cast<double>(dealerWins) / totalRounds) * 100;
+            tiePercent = (static_cast<double>(ties) / totalRounds) * 100;
+        // handle the case where no rounds have been played
+        } else 
+        {
+            playerWinPercent = 0;
+            houseWinPercent = 0;
+            tiePercent = 0;
+        }
+    // Print the stats
+    cout << fixed << setprecision(2);
+    cout << "Player 1 Wins: " << playerWins << " (" << playerWinPercent << "%)" << endl;
+    cout << "Dealer Wins: " << dealerWins << " (" << houseWinPercent << "%)" << endl;
+    cout << "Ties: " << ties << " (" << tiePercent << "%)" << endl;
+
+    }
+};
+
+GameStats stats;
+
+
+// Function to draw a card from the deck and add it to a hand
 void drawFromDeck(Hand& h, Deck& deck) 
 {
     Card drawnCard = deck.drawCard(); 
@@ -197,6 +236,7 @@ void drawFromDeck(Hand& h, Deck& deck)
     }
 }
 
+// Function to deal a card to a hand
 Hand dealCard(Hand& hand, Deck& deck) 
     {
         drawFromDeck(hand, deck);
@@ -212,6 +252,7 @@ Hand dealCard(Hand& hand, Deck& deck)
      //   }
 
     //	toString(h);
+
 
 // Function to create hands for the dealer and players
 void createHands(Hand& dealerHand, Hand& player1Hand) 
@@ -230,6 +271,7 @@ void dealCards(Hand& dealerHand, Hand& player1Hand, Deck& deck)
     player1Hand = dealCard(player1Hand, deck);
     dealerHand = dealCard(dealerHand, deck);
 }
+
 
 // function to print the dealer's hand
 void printDealerHand(const Hand& dealerHand, bool revealHoleCard)
@@ -345,20 +387,25 @@ int determineWinner(const Hand& dealerHand, const Hand& player1Hand)
 
 }
 
+// Function to print the game statistics
+
+
 
 // Function to play a round of Blackjack
 void playRound(Deck& deck, Hand& dealerHand, Hand& player1Hand) 
 {
+    // Initialize the game
     deck.shuffleDeck();  // Shuffle the deck for a new round
     dealerHand = Hand::createHand("Dealer");
     player1Hand = Hand::createHand("Player 1");
     dealCards(dealerHand, player1Hand, deck);  // Initial card dealing
-
+    // prin the hands and check for blackjack
     printAllHands(dealerHand, player1Hand, false); // Print initial hands
     checkBlackjack(dealerHand, player1Hand); // Check for Blackjack
 
     // Player's turn
     bool playerTurn = true;
+    // loop to allow the player to hit or stand, exit if the player busts or stands
     while (playerTurn && player1Hand.evaluateScore(false) < 21) 
     {
         playerTurn = hitOrStand(player1Hand, deck); // Hit or Stand
@@ -366,32 +413,45 @@ void playRound(Deck& deck, Hand& dealerHand, Hand& player1Hand)
     }
 
     // DEBUG: Print the player's hand and score
-    cout << "DEBUG: Player 1's Score: " << player1Hand.evaluateScore(false) << endl;
+   // std::cout << "DEBUG: Player 1's Score: " << player1Hand.evaluateScore(false) << endl;
 
 
-    // Dealer's turn
+    // Dealer's turn (hit until score is 17 or higher)
     while (dealerHand.evaluateScore(true) < 17) 
     {
         dealerHand = dealCard(dealerHand, deck);
     }
-    printDealerHand(dealerHand, true); // Reveal dealer's hand
+    // Reveal dealer's hand
+    printDealerHand(dealerHand, true); 
 
     // DEBUG: Print the dealer's hand and score
-    cout << "DEBUG: Dealer's Score: " << dealerHand.evaluateScore(true) << endl;
+   // std::cout << "DEBUG: Dealer's Score: " << dealerHand.evaluateScore(true) << endl;
     dealerHand.toString();
     
 
     int winner = determineWinner(dealerHand, player1Hand);
 
-    if (winner == 1) cout << "Jackpot! Looks like luck is on your side!" << endl;
-    else if (winner == -1) cout << "The house wins this round, but don't fold yet!!" << endl;
-    else cout << "Both sides holding strong!" << endl;
+    if (winner == 1) 
+    {
+        std::cout << "Jackpot! Looks like luck is on your side!" << endl;
+        stats.playerWins++;
+
+    } else if (winner == -1) 
+    {
+        std::cout << "The house wins this round, but don't fold yet!!" << endl;
+        stats.dealerWins++;
+    }
+    else 
+    { 
+        std::cout << "Both sides holding strong!" << endl;
+        stats.ties++;
+    }
+    stats.printStats();
 }
 
 
 
 //* ======= MAIN ======= *//
-// TODO: Keep track of Player and Dealer wins, losses and ties
  // TODO: Additional  logic for other players 
 
 
@@ -416,6 +476,5 @@ int main()
 
     return 0;
 
-} // end main
 
-	
+} // end main
