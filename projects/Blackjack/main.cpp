@@ -103,6 +103,12 @@ struct Hand
     // max possible hand is A,A,A,A,2,2,2,2,3,3,3
     Card card[12];
 
+    // Default constructor
+    Hand() : owner("Unknown"), numCards(0) {}
+
+    // Constructor to create a hand with a specified owner
+    Hand(const string& ownerName) : owner(ownerName) {}
+
 // function to print a hand
     void toString()
     {
@@ -114,14 +120,6 @@ struct Hand
         }
     std::cout << s << endl;
     }
-
-    // function to create a hand
-    static Hand createHand(string owner)
-    {
-        Hand h;
-        h.owner = owner;
-        return h;
-    };
 
 
     // function to add a card to a hand
@@ -255,12 +253,12 @@ Hand dealCard(Hand& hand, Deck& deck)
 
 
 // Function to create hands for the dealer and players
-void createHands(Hand& dealerHand, Hand& player1Hand) 
-{
-    dealerHand = Hand::createHand("Dealer");
-    player1Hand = Hand::createHand("Player 1");
-}
 
+pair<Hand, Hand> createHands(){
+    Hand dealerHand("Dealer");
+    Hand player1Hand("Player 1");
+    return make_pair(dealerHand, player1Hand);
+}
 
 
 // Function to deal cards to the players and the dealer
@@ -278,10 +276,10 @@ void printDealerHand(const Hand& dealerHand, bool revealHoleCard)
 {
     if (revealHoleCard == true) 
     {
-        std::cout << "dealer cards: " << dealerHand.card[0].value + dealerHand.card[0].suit << " " << dealerHand.card[1].value + dealerHand.card[1].suit << endl;
+        std::cout << "Dealer cards: " << dealerHand.card[0].value + dealerHand.card[0].suit << " " << dealerHand.card[1].value + dealerHand.card[1].suit << endl;
     } else 
     {
-        std::cout << "dealer cards: ?? " << dealerHand.card[1].value + dealerHand.card[1].suit << endl;
+        std::cout << "Dealer cards: ?? " << dealerHand.card[1].value + dealerHand.card[1].suit << endl;
     }
 
 }
@@ -392,19 +390,22 @@ int determineWinner(const Hand& dealerHand, const Hand& player1Hand)
 
 
 // Function to play a round of Blackjack
-void playRound(Deck& deck, Hand& dealerHand, Hand& player1Hand) 
+void playRound(Deck& deck) 
 {
     // Initialize the game
     deck.shuffleDeck();  // Shuffle the deck for a new round
-    dealerHand = Hand::createHand("Dealer");
-    player1Hand = Hand::createHand("Player 1");
-    dealCards(dealerHand, player1Hand, deck);  // Initial card dealing
+
+    // Create hands for the dealer and player and deal the initial cards
+    auto [dealerHand, player1Hand] = createHands(); 
+    dealCards(dealerHand, player1Hand, deck);
+
     // prin the hands and check for blackjack
-    printAllHands(dealerHand, player1Hand, false); // Print initial hands
-    checkBlackjack(dealerHand, player1Hand); // Check for Blackjack
+    printAllHands(dealerHand, player1Hand, false); 
+    checkBlackjack(dealerHand, player1Hand); 
 
     // Player's turn
     bool playerTurn = true;
+
     // loop to allow the player to hit or stand, exit if the player busts or stands
     while (playerTurn && player1Hand.evaluateScore(false) < 21) 
     {
@@ -415,7 +416,6 @@ void playRound(Deck& deck, Hand& dealerHand, Hand& player1Hand)
     // DEBUG: Print the player's hand and score
    // std::cout << "DEBUG: Player 1's Score: " << player1Hand.evaluateScore(false) << endl;
 
-
     // Dealer's turn (hit until score is 17 or higher)
     while (dealerHand.evaluateScore(true) < 17) 
     {
@@ -423,14 +423,15 @@ void playRound(Deck& deck, Hand& dealerHand, Hand& player1Hand)
     }
     // Reveal dealer's hand
     printDealerHand(dealerHand, true); 
+    dealerHand.toString();
 
     // DEBUG: Print the dealer's hand and score
    // std::cout << "DEBUG: Dealer's Score: " << dealerHand.evaluateScore(true) << endl;
-    dealerHand.toString();
     
-
+    
+    // Determine the winner of the round
     int winner = determineWinner(dealerHand, player1Hand);
-
+    // Print the winner and update the game statistics
     if (winner == 1) 
     {
         std::cout << "Jackpot! Looks like luck is on your side!" << endl;
@@ -447,6 +448,7 @@ void playRound(Deck& deck, Hand& dealerHand, Hand& player1Hand)
         stats.ties++;
     }
     stats.printStats();
+
 }
 
 
@@ -464,8 +466,7 @@ int main()
 
    while(playAgain)
    {
-        Hand dealerHand, player1Hand;
-        playRound(deck, dealerHand, player1Hand);
+    playRound(deck);
 
         //replay option
         std::cout << "Would you like to play again? (yes/no) ";
