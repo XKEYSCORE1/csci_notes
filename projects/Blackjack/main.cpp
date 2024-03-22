@@ -10,13 +10,15 @@ using namespace std;
 
 
 // struct to represent a card
-struct Card{
+struct Card
+{
 	string value;
 	string suit;
 };
 
 // struct to represent a deck of cards
-struct Deck {
+struct Deck 
+{
     int currentCard = 0;
     Card card[52];
 
@@ -56,6 +58,17 @@ struct Deck {
 
     }
 
+    // Function to print the deck
+    void printDeck() 
+    {
+        for (int i = 0; i < 52; i++) 
+        {
+            cout << card[i].value << card[i].suit;
+            if (i != 51) cout << ", ";
+        }
+        cout << endl;
+    }
+
     // Function to draw a card from the deck
     Card drawCard() 
     {
@@ -66,7 +79,7 @@ struct Deck {
         {
             return Card{"", ""};
         }
-    }
+    }    
 
     // Function to replace suit symbols in a card
     static Card suitReplace(Card c) 
@@ -78,16 +91,6 @@ struct Deck {
         return c;
     }
 
-    // Function to print the deck
-    void printDeck() 
-    {
-        for (int i = 0; i < 52; i++) 
-        {
-            cout << card[i].value << card[i].suit;
-            if (i != 51) cout << ", ";
-        }
-        cout << endl;
-    }
 };
 
 
@@ -99,24 +102,38 @@ struct Hand
     // max possible hand is A,A,A,A,2,2,2,2,3,3,3
     Card card[12];
 
+// function to print a hand
+    void toString()
+    {
+        std::string s;
+        std::cout << "\n" << owner << "'s hand:";
+        for(int i=0; i < numCards; i++)
+        {
+            s += ( " " +printCard(card[i]) );
+        }
+    std::cout << s << endl;
+    }
+
     // function to create a hand
     static Hand createHand(string owner)
     {
         Hand h;
         h.owner = owner;
         return h;
-    }
+    };
+
 
     // function to add a card to a hand
     void addCard(Card c)
     {
-        // h.numCards is the last element in the Hand's Card array.
         // Don't attempt to add past element 11 (0-11 is 12 items).
         if (numCards < 11) 
         {
             card[numCards] = c;
             // the hand is one larger.
             numCards++;
+
+            // DEBUG: Print the hand size
             cout << "DEBUG: " << owner << "'s hand size: " << numCards << endl;
         }
     }
@@ -127,110 +144,63 @@ struct Hand
         return card.value + card.suit;
     }
 
+
+    // function to evaluate the score of a hand
+    int evaluateScore(bool isDealer) const 
+    {
+        int score = 0;
+        int aceCount = 0;
+
+    // map to store the value of each card
+        map<string, int> cardMap = 
+        {
+            {"K", 10}, {"Q", 10}, {"J", 10}, {"T", 10},
+            {"9", 9}, {"8", 8}, {"7", 7}, {"6", 6},
+            {"5", 5}, {"4", 4}, {"3", 3}, {"2", 2}
+        };
+
+    // for loop to iterate through the cards in the hand
+        for (int i = 0; i < numCards; ++i) 
+        {   // if the card is an Ace, add 11 to the score and increment the aceCount
+            if (card[i].value == "A") 
+            {
+                aceCount++;
+                score += 11;
+                        //add the value of the card to the score
+            } else {
+                score += cardMap[card[i].value];
+            }
+        }
+    // if the score is over 21, convert an Ace from 11 to 1
+        while (aceCount > 0 && score > 21) 
+        {
+            score -= 10;  // Convert an Ace from 11 to 1
+            aceCount--;
+        }
+
+        return score;
+    }
+
 };
 
-
-
-// void printDealer( Hand h ){
-//     string s;
-//     std::cout << "\n" << h.owner << "'s hand:";
-//     for(int i=0; i < h.numCards; i++){
-//         if(i==0){
-//             s += " ??";
-//         }else{
-//             s += ( " " + printCard(h.card[i]) );
-//         }
-//     }
-// }
-
-
-
-// Function to deal a card to a player
-Hand& dealCard(Hand& h, Deck& d) 
-{ 
-    // Attempt to draw a card from the deck
-    Card drawnCard = d.drawCard();
-
-    // Check if the drawn card is valid (not empty)
+void drawFromDeck(Hand& h, Deck& deck) 
+{
+    Card drawnCard = deck.drawCard(); 
+    
     if (drawnCard.value != "" && drawnCard.suit != "") 
     {
-        // DEBUG: Print the card being dealt
-        cout << "Dealing card: " << drawnCard.value << drawnCard.suit << endl;
         h.addCard(drawnCard);
     } else 
     {
-        // Handle the empty deck scenario
-        cout << "Error: Deck is empty, no more cards to deal." << endl;
+        std::cout << "ERROR: No more cards to deal." << endl;
     }
-    
-    return h;
-
 }
 
-
-
-
-// Function to evaluate the score of a hand
-int eval(Hand h, bool isDealer) 
-{
-
-    int score = 0;  // Score of the hand
-    int aceCount = 0; // Count of Aces in the hand
-
-    map<string, int> cardMap =  // Map of card values to their point values
-    { 
-        {"K", 10},
-        {"Q", 10},
-        {"J", 10},
-        {"T", 10},
-        {"9", 9},
-        {"8", 8},
-        {"7", 7},
-        {"6", 6},
-        {"5", 5},
-        {"4", 4},
-        {"3", 3},
-        {"2", 2}
-    };
-
-
-    // Calculate initial score and count Aces
-    for (int n = 0; n < h.numCards; n++) 
+Hand dealCard(Hand& hand, Deck& deck) 
     {
-                    // DEBUG: Print the card being evaluated and the current score
-        cout << "Evaluating card: " << h.card[n].value << h.card[n].suit << " Current Score: " << score << endl;
-        if (h.card[n].value == "A") 
-        {
-            aceCount++;
-            score += 11;
-        } else 
-        {
-            auto search = cardMap.find(h.card[n].value);
-            if (search != cardMap.end()) 
-            {
-                score += search->second;
-            } else 
-            {
-                std::cout << "ERROR: Invalid card value\n";
-            }
-        }
+        drawFromDeck(hand, deck);
+        return hand;
     }
-
-
-    // Adjust for Aces for both dealer and player
-    while (aceCount > 0 && score > 21) 
-    {
-        score -= 10; // Change an Ace from 11 to 1
-        aceCount--;
-    }
-
-    // DEBUG: Print the final score
-    cout << "Final score: " << score << endl;
-
-    return score;
-}
-
-
 
             
 	// DEBUG: Print the cardVal map -- comment this out in your program 
@@ -240,21 +210,7 @@ int eval(Hand h, bool isDealer)
     //          cout << key << ":\t" << value << " points\n";
      //   }
 
-//	printHand(h);
-
-
-// function to print the deck
-void printDeck(Deck d)
-{
-    for(int i=0; i<52; i++)
-    {
-        std::cout << d.card[i].value << d.card[i].suit;
-        if(i!=51)
-        { std::cout << ',';};
-    }
- }
-
-
+    //	toString(h);
 
 // Function to create hands for the dealer and players
 void createHands(Hand& dealerHand, Hand& player1Hand) 
@@ -266,6 +222,7 @@ void createHands(Hand& dealerHand, Hand& player1Hand)
 
 
 // Function to deal cards to the players and the dealer
+
 void dealCards(Hand& dealerHand, Hand& player1Hand, Deck& deck) 
 {
     player1Hand = dealCard(player1Hand, deck);
@@ -273,22 +230,6 @@ void dealCards(Hand& dealerHand, Hand& player1Hand, Deck& deck)
     player1Hand = dealCard(player1Hand, deck);
     dealerHand = dealCard(dealerHand, deck);
 }
-
-
-
-
-void printHand(Hand h)
-{
-    std::string s;
-    std::cout << "\n" << h.owner << "'s hand:";
-    for(int i=0; i < h.numCards; i++)
-    {
-        s += ( " " +h.printCard(h.card[i]) );
-    }
-    std::cout << s << endl;
-
-}
-
 
 
 void printDealerHand(const Hand& dealerHand, bool revealHoleCard)
@@ -306,11 +247,11 @@ void printDealerHand(const Hand& dealerHand, bool revealHoleCard)
 
 // Function to print the hands of all players, and display the dealer's hole card if the revealHoleCard parameter is true
 void printAllHands(const Hand& dealerHand, const Hand& player1Hand, bool revealHoleCard) 
-{
-    printHand(player1Hand);
+{   
+    Hand h = player1Hand;
+    h.toString();
     printDealerHand(dealerHand, revealHoleCard);
-    
-    // TODO: Additional printing logic for other players 
+
 }
 
 
@@ -318,8 +259,8 @@ void printAllHands(const Hand& dealerHand, const Hand& player1Hand, bool revealH
  // Check for Blackjack condition
 void checkBlackjack(const Hand& dealerHand, const Hand& player1Hand) 
 {
-    int dealerScore = eval(dealerHand, true);
-    int player1Score = eval(player1Hand, false);
+    int dealerScore = dealerHand.evaluateScore(true);
+    int player1Score = player1Hand.evaluateScore(false);
 
     if (dealerScore == 21 && player1Score == 21) 
     {
@@ -373,8 +314,8 @@ bool hitOrStand(Hand& playerHand, Deck& deck)
 // Function to determine the winner of the round
 int determineWinner(const Hand& dealerHand, const Hand& player1Hand) 
 {
-    int dealerScore = eval(dealerHand, true);
-    int player1Score = eval(player1Hand, false);
+    int dealerScore = dealerHand.evaluateScore(true);
+    int player1Score = player1Hand.evaluateScore(false);
 
     if (dealerScore > 21) 
     {
@@ -405,16 +346,46 @@ int determineWinner(const Hand& dealerHand, const Hand& player1Hand)
 }
 
 
-
 // Function to play a round of Blackjack
-void playGame(Hand& dealerHand, Hand& player1Hand, Deck& deck) 
+void playRound(Deck& deck, Hand& dealerHand, Hand& player1Hand) 
 {
-    deck.shuffleDeck();
-    bool revealHoleCard = false;
-    dealCards(dealerHand, player1Hand, deck);
+    deck.shuffleDeck();  // Shuffle the deck for a new round
+    dealerHand = Hand::createHand("Dealer");
+    player1Hand = Hand::createHand("Player 1");
+    dealCards(dealerHand, player1Hand, deck);  // Initial card dealing
 
-    // Print initial hands
-    printAllHands(dealerHand, player1Hand, false);
+    printAllHands(dealerHand, player1Hand, false); // Print initial hands
+    checkBlackjack(dealerHand, player1Hand); // Check for Blackjack
+
+    // Player's turn
+    bool playerTurn = true;
+    while (playerTurn && player1Hand.evaluateScore(false) < 21) 
+    {
+        playerTurn = hitOrStand(player1Hand, deck); // Hit or Stand
+        player1Hand.toString();
+    }
+
+    // DEBUG: Print the player's hand and score
+    cout << "DEBUG: Player 1's Score: " << player1Hand.evaluateScore(false) << endl;
+
+
+    // Dealer's turn
+    while (dealerHand.evaluateScore(true) < 17) 
+    {
+        dealerHand = dealCard(dealerHand, deck);
+    }
+    printDealerHand(dealerHand, true); // Reveal dealer's hand
+
+    // DEBUG: Print the dealer's hand and score
+    cout << "DEBUG: Dealer's Score: " << dealerHand.evaluateScore(true) << endl;
+    dealerHand.toString();
+    
+
+    int winner = determineWinner(dealerHand, player1Hand);
+
+    if (winner == 1) cout << "Jackpot! Looks like luck is on your side!" << endl;
+    else if (winner == -1) cout << "The house wins this round, but don't fold yet!!" << endl;
+    else cout << "Both sides holding strong!" << endl;
 }
 
 
@@ -427,73 +398,24 @@ int main()
 {
 
     srand(time(0));
-
-    // Game state loop
     bool playAgain = true;
-
-    Hand dealerHand = Hand::createHand("Dealer");
-    Hand player1Hand = Hand::createHand("Player 1");
-
     Deck deck;
 
-    do {
-        playGame(dealerHand, player1Hand, deck); // call game logic and play a round of Blackjack
-        checkBlackjack(dealerHand, player1Hand); // check for initial Blackjack condition
+   while(playAgain)
+   {
+        Hand dealerHand, player1Hand;
+        playRound(deck, dealerHand, player1Hand);
 
-        bool playerTurn = true; // flag to indicate if it is the player's turn
-        
-        while(playerTurn && eval(player1Hand, false) < 21) // if it is the player's turn and their hand is less than 21, 
-        {
-            playerTurn = hitOrStand(player1Hand, deck); // prompt player to hit or stand, deal cards, and increment the deck
-            printAllHands(dealerHand, player1Hand, false); // print the hands of all players
-        
-        }
-
-        while(eval(dealerHand, true) < 17)  // if less than 17, deal cards to the dealer and increment the deck
-        {
-            dealerHand = dealCard(dealerHand, deck);
-            deck.currentCard++;
-        }
-
-        printAllHands(dealerHand, player1Hand, true);
-        determineWinner(dealerHand, player1Hand);
-
-
-        std::cout << "Game over." << endl;
-
-        // Ask if the player wants to play again
-        std::cout << "Do you want to play again? (yes/no) ";
-        std::string playAgainChoice;
-        std::cin >> playAgainChoice;
-        
-        if(playAgainChoice == "no" || playAgainChoice == "n" || playAgainChoice == "No" || playAgainChoice == "NO" || playAgainChoice == "N") 
-        {
-            playAgain = false;
-        }
-        else if (playAgainChoice == "yes" || playAgainChoice == "y" || playAgainChoice == "Yes" || playAgainChoice == "YES" || playAgainChoice == "Y") 
-        {
-            playAgain = true;
-        }
-        else 
-        {
-            cout << "Invalid input. Please enter yes or no." << endl;
-            playAgain = false;
-        }
-    } while (playAgain);
+        //replay option
+        std::cout << "Would you like to play again? (yes/no) ";
+        std::string playAgain_answer;
+        std::cin >> playAgain_answer;
+        playAgain = (playAgain_answer == "yes" || playAgain_answer == "y");
+   }
 
     return 0;
-}
 
+} // end main
 
-
-
-	// TODO: print out hand of all players
-	// TODO: Check for a Blackjack condition.  The game ends if any player (or the dealer) was dealt Blackjack.
-	// If the Dealer has Blackjack and a Player doesn't, the game is over and every Player loses.
-	// It's a PUSH (tie) if the Player has one as well, nobody "wins"
-	// TODO: Prompt each player to Hit or Stand and deal out cards *appropriately*
-	// -- if they have 21, don't let them hit.
-	// TODO: The turn ends for each player if they bust (score > 21), and have no Aces (that they can elect to be a 1).
-	// TODO: The dealer takes the last turn, and has an opportunity to hit repeatedly (on a hand <= 16, but must stand on a 17 or above).
 	// TODO: Keep track of Player and Dealer wins, losses and ties
-	// TODO: Put the entire game in a play again (game state loop) -- each hand is one round of a larger game. 
+    // TODO: Additional  logic for other players 
