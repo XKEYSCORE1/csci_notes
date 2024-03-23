@@ -3,28 +3,27 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
-#include <iterator> 
+#include <iterator>
 #include <map>
 #include <utility>
 
 using namespace std;
 
-
 // struct to represent a card
 struct Card
 {
-	string value;
-	string suit;
+    string value;
+    string suit;
 };
 
 // struct to represent a deck of cards
-struct Deck 
+struct Deck
 {
     int currentCard = 0;
     Card card[52];
 
     // Constructor to create and shuffle a deck
-    Deck() 
+    Deck()
     {
         const char suits[] = {'C', 'D', 'H', 'S'};
         const string cardValues[] = {"A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"};
@@ -32,9 +31,9 @@ struct Deck
         Card current;
 
         // Create the deck and replace suits
-        for (int n = 0; n < 4; n++) 
+        for (int n = 0; n < 4; n++)
         {
-            for (int m = 0; m < 13; m++) 
+            for (int m = 0; m < 13; m++)
             {
                 current.suit = string(1, suits[n]);
                 current.value = cardValues[m];
@@ -48,55 +47,58 @@ struct Deck
     }
 
     // Function to shuffle the deck
-    void shuffleDeck() 
+    void shuffleDeck()
     {
 
-        for (int i = 0; i < 52; i++) 
+        for (int i = 0; i < 52; i++)
         {
             int j = i + rand() % (52 - i);
             swap(card[i], card[j]);
         }
-
     }
 
     // Function to print the deck
-    void printDeck() 
+    void printDeck()
     {
-        for (int i = 0; i < 52; i++) 
+        for (int i = 0; i < 52; i++)
         {
             cout << card[i].value << card[i].suit;
-            if (i != 51) cout << ", ";
+            if (i != 51)
+                cout << ", ";
         }
         std::cout << endl;
     }
 
     // Function to draw a card from the deck
-    Card drawCard() 
+    Card drawCard()
     {
-        if (currentCard < 52) 
+        if (currentCard < 52)
         {
             return card[currentCard++];
-        } else
+        }
+        else
         {
             return Card{"", ""};
         }
-    }    
-
-    // Function to replace suit symbols in a card
-    static Card suitReplace(Card c) 
-    {
-        if (c.suit == "S") c.suit = "♠";
-        else if (c.suit == "H") c.suit = "♥";
-        else if (c.suit == "C") c.suit = "♣";
-        else if (c.suit == "D") c.suit = "♦";
-        return c;
     }
 
+    // Function to replace suit symbols in a card
+    static Card suitReplace(Card c)
+    {
+        if (c.suit == "S")
+            c.suit = "♠";
+        else if (c.suit == "H")
+            c.suit = "♥";
+        else if (c.suit == "C")
+            c.suit = "♣";
+        else if (c.suit == "D")
+            c.suit = "♦";
+        return c;
+    }
 };
 
-
 // struct to represent a hand of cards
-struct Hand 
+struct Hand
 {
     string owner;
     int numCards = 0;
@@ -107,375 +109,350 @@ struct Hand
     Hand() : owner("Unknown"), numCards(0) {}
 
     // Constructor to create a hand with a specified owner
-    Hand(const string& ownerName) : owner(ownerName) {}
+    Hand(const string &ownerName) : owner(ownerName) {}
 
-// function to print a hand
-    void toString()
+    // function to print a hand
+    void toString() const
     {
         std::string s;
-        std::cout << "\n" << owner << "'s hand:";
-        for(int i=0; i < numCards; i++)
+        std::cout << "\n"
+                  << owner << "'s hand:";
+        for (int i = 0; i < numCards; i++)
         {
-            s += ( " " +printCard(card[i]) );
+            s += (" " + printCard(card[i]));
         }
-    std::cout << s << endl;
+        std::cout << s << endl;
     }
-
 
     // function to add a card to a hand
     void addCard(Card c)
     {
         // Don't attempt to add past element 11 (0-11 is 12 items).
-        if (numCards < 11) 
+        if (numCards < 11)
         {
             card[numCards] = c;
             // the hand is one larger.
             numCards++;
 
             // DEBUG: Print the hand size
-            //std::cout << "DEBUG: " << owner << "'s hand size: " << numCards << endl;
+            // std::cout << "DEBUG: " << owner << "'s hand size: " << numCards << endl;
         }
     }
 
     // function to print a card
-    string printCard(const Card& card) const 
+    string printCard(const Card &card) const
     {
         return card.value + card.suit;
     }
 
-
     // function to evaluate the score of a hand
-    int evaluateScore(bool isDealer) const 
+    int evaluateScore(bool isDealer) const
     {
         int score = 0;
         int aceCount = 0;
 
-    // map to store the value of each card
-        map<string, int> cardMap = 
-        {
-            {"K", 10}, {"Q", 10}, {"J", 10}, {"T", 10},
-            {"9", 9}, {"8", 8}, {"7", 7}, {"6", 6},
-            {"5", 5}, {"4", 4}, {"3", 3}, {"2", 2}
-        };
+        // map to store the value of each card
+        map<string, int> cardMap =
+            {
+                {"K", 10}, {"Q", 10}, {"J", 10}, {"T", 10}, {"9", 9}, {"8", 8}, {"7", 7}, {"6", 6}, {"5", 5}, {"4", 4}, {"3", 3}, {"2", 2}};
 
-    // for loop to iterate through the cards in the hand
-        for (int i = 0; i < numCards; ++i) 
-        {   // if the card is an Ace, add 11 to the score and increment the aceCount
-            if (card[i].value == "A") 
+        // for loop to iterate through the cards in the hand
+        for (int i = 0; i < numCards; ++i)
+        { // if the card is an Ace, add 11 to the score and increment the aceCount
+            if (card[i].value == "A")
             {
                 aceCount++;
                 score += 11;
-                        //add the value of the card to the score
-            } else {
+                // add the value of the card to the score
+            }
+            else
+            {
                 score += cardMap[card[i].value];
             }
         }
-    // if the score is over 21, convert an Ace from 11 to 1
-        while (aceCount > 0 && score > 21) 
+        // if the score is over 21, convert an Ace from 11 to 1
+        while (aceCount > 0 && score > 21)
         {
-            score -= 10;  // Convert an Ace from 11 to 1
+            score -= 10; // Convert an Ace from 11 to 1
             aceCount--;
         }
 
         return score;
     }
-
 };
 
 // struct to represent the game stats
 struct GameStats
 {
+    // Initialize the stats
     int playerWins = 0;
     int dealerWins = 0;
     int ties = 0;
-
+    // Function to print the stats
     void printStats() const
     {
 
         // Calculate the rounds played
         int totalRounds = playerWins + dealerWins + ties;
         double playerWinPercent, houseWinPercent, tiePercent;
-         // Calculate the percentage of wins for each player
+        // Calculate the percentage of wins for each player
         if (totalRounds > 0)
         {
             playerWinPercent = (static_cast<double>(playerWins) / totalRounds) * 100;
             houseWinPercent = (static_cast<double>(dealerWins) / totalRounds) * 100;
             tiePercent = (static_cast<double>(ties) / totalRounds) * 100;
-        // handle the case where no rounds have been played
-        } else 
+            // handle the case where no rounds have been played
+        }
+        else
         {
             playerWinPercent = 0;
             houseWinPercent = 0;
             tiePercent = 0;
         }
-    // Print the stats
-    cout << fixed << setprecision(2);
-    cout << "Player 1 Wins: " << playerWins << " (" << playerWinPercent << "%)" << endl;
-    cout << "Dealer Wins: " << dealerWins << " (" << houseWinPercent << "%)" << endl;
-    cout << "Ties: " << ties << " (" << tiePercent << "%)" << endl;
-
+        // Print the stats
+        cout << fixed << setprecision(2);
+        cout << "Player 1 Wins: " << playerWins << " (" << playerWinPercent << "%)" << endl;
+        cout << "Dealer Wins: " << dealerWins << " (" << houseWinPercent << "%)" << endl;
+        cout << "Ties: " << ties << " (" << tiePercent << "%)" << endl;
     }
 };
 
+// Global variable to store the game stats
 GameStats stats;
 
-
 // Function to draw a card from the deck and add it to a hand
-void drawFromDeck(Hand& h, Deck& deck) 
+Hand drawFromDeck(Hand &hand, Deck &deck)
 {
-    Card drawnCard = deck.drawCard(); 
-    
-    if (drawnCard.value != "" && drawnCard.suit != "") 
+    // Draw a card from the deck
+    Card drawnCard = deck.drawCard();
+
+    // Add the card to the hand if it is not empty
+    if (drawnCard.value != "" && drawnCard.suit != "")
     {
-        h.addCard(drawnCard);
-    } else 
+        hand.addCard(drawnCard);
+    }
+    else
     {
         std::cout << "ERROR: No more cards to deal." << endl;
     }
+    return hand;
 }
-
-// Function to deal a card to a hand
-Hand dealCard(Hand& hand, Deck& deck) 
-    {
-        drawFromDeck(hand, deck);
-        return hand;
-    }
-
-            
-	// DEBUG: Print the cardVal map -- comment this out in your program 
-    // cout << "\nThe map is:\n"; 
-    // cout << "KEY\tVALUE\n";
-    //     for (const auto& [key, value] : cardMap){
-    //          cout << key << ":\t" << value << " points\n";
-     //   }
-
-    //	toString(h);
-
 
 // Function to create hands for the dealer and players
+vector<Hand> createHands(int numPlayers)
+{
 
-pair<Hand, Hand> createHands(){
-    Hand dealerHand("Dealer");
-    Hand player1Hand("Player 1");
-    return make_pair(dealerHand, player1Hand);
+    vector<Hand> hands;
+
+    // Create hands for all players
+    for (int i = 0; i < numPlayers; i++)
+    {
+        hands.push_back(Hand("Player " + to_string(i + 1)));
+    }
+
+    // Create a hand for the dealer
+    hands.push_back(Hand("Dealer"));
+    // Return the vector of hands created
+    return hands;
 }
-
 
 // Function to deal cards to the players and the dealer
-void dealCards(Hand& dealerHand, Hand& player1Hand, Deck& deck) 
+void dealCards(vector<Hand> &hands, Deck &deck)
 {
-    player1Hand = dealCard(player1Hand, deck);
-    dealerHand = dealCard(dealerHand, deck);
-    player1Hand = dealCard(player1Hand, deck);
-    dealerHand = dealCard(dealerHand, deck);
+    // Deal two rounds of cards
+    for (int round = 0; round < 2; round++)
+    {
+        // Deal one card to each player
+        for (Hand &hand : hands)
+        {
+            drawFromDeck(hand, deck); // Deal one card to each hand
+        }
+    }
 }
 
-
 // function to print the dealer's hand
-void printDealerHand(const Hand& dealerHand, bool revealHoleCard)
+void printDealerHand(const Hand &dealerHand, bool revealHoleCard)
 {
-    if (revealHoleCard == true) 
+    // Print the dealer's hand with the hole card revealed based on the revealHoleCard parameter
+    if (revealHoleCard == true)
     {
         std::cout << "Dealer cards: " << dealerHand.card[0].value + dealerHand.card[0].suit << " " << dealerHand.card[1].value + dealerHand.card[1].suit << endl;
-    } else 
+    }
+    else
     {
         std::cout << "Dealer cards: ?? " << dealerHand.card[1].value + dealerHand.card[1].suit << endl;
     }
-
 }
-
 
 // Function to print the hands of all players, and display the dealer's hole card if the revealHoleCard parameter is true
-void printAllHands(const Hand& dealerHand, const Hand& player1Hand, bool revealHoleCard) 
-{   
-    Hand h = player1Hand;
-    h.toString();
-    printDealerHand(dealerHand, revealHoleCard);
-
-}
-
-
-
- // Check for Blackjack condition
-void checkBlackjack(const Hand& dealerHand, const Hand& player1Hand) 
+void printAllHands(const vector<Hand> &hands, bool revealHoleCard)
 {
-    int dealerScore = dealerHand.evaluateScore(true);
-    int player1Score = player1Hand.evaluateScore(false);
+    for (size_t i = 0; i < hands.size(); ++i)
+    {
+        if (hands[i].owner != "Dealer")
+        {
+            hands[i].toString();
+        }
+    }
 
-    if (dealerScore == 21 && player1Score == 21) 
-    {
-        std::cout << "Push! Both the dealer and player 1 have Blackjack." << endl;
-        return;
-    }
-    else if (dealerScore == 21) 
-    {
-        std::cout << "The dealer has Blackjack. Player 1 loses." << endl;
-        return;
-    }
-    else if (player1Score == 21) 
-    {
-        std::cout << "Player 1 has Blackjack. Player 1 wins." << endl;
-        
-        return;
-    }
+    // Print the dealer's hand last, with hole card based on revealHoleCard
+    printDealerHand(hands.back(), revealHoleCard);
 }
 
+// Check for Blackjack condition for multiple players
+bool checkBlackjack(const vector<Hand> &hands)
+{
+    bool dealerBlackjack = hands.back().evaluateScore(true) == 21;
 
+    for (size_t i = 0; i < hands.size() - 1; ++i)
+    {
+        int playerScore = hands[i].evaluateScore(false);
+        if (playerScore == 21 || dealerBlackjack)
+        {
+            // Print outcome based on who got Blackjack
+            if (playerScore == 21 && dealerBlackjack)
+            {
+                cout << "Push! Both " << hands[i].owner << " and dealer have Blackjack." << endl;
+            }
+            else if (dealerBlackjack)
+            {
+                cout << "The dealer has Blackjack. " << hands[i].owner << " loses." << endl;
+            }
+            else
+            {
+                cout << hands[i].owner << " has Blackjack. " << hands[i].owner << " wins." << endl;
+            }
+
+            return true; // End the round immediately if Blackjack is found
+        }
+    }
+
+    return false; // Continue the game if no Blackjack is found
+}
 
 // Function to prompt the player to hit or stand
-bool hitOrStand(Hand& playerHand, Deck& deck) 
+bool hitOrStand(Hand &playerHand, Deck &deck)
 {
 
-    std::cout << "Would you like to hit or stand? ";
-    
+    std::cout << playerHand.owner << ":  Would you like to hit or stand? ";
+
     std::string hitOrStand_answer;
     std::cin >> hitOrStand_answer;
 
-    if (hitOrStand_answer == "hit") 
+    if (hitOrStand_answer == "hit")
     {
-        playerHand = dealCard(playerHand, deck);
-        return true;  // Player chooses to hit
-
-    } else if (hitOrStand_answer == "stand") 
+        playerHand = drawFromDeck(playerHand, deck);
+        return true; // Player chooses to hit
+    }
+    else if (hitOrStand_answer == "stand")
     {
         std::cout << "You chose to stand." << endl;
-        return false;  // Player chooses to stand
-
-    } else 
+        return false; // Player chooses to stand
+    }
+    else
     {
         std::cout << "Invalid input. Please enter hit or stand." << endl;
-        return true;  // Continue the turn by default
-
+        return true; // Continue the turn by default
     }
 }
-
-
 
 // Function to determine the winner of the round
-int determineWinner(const Hand& dealerHand, const Hand& player1Hand) 
+int determineWinner(vector<Hand> &hands, GameStats &stats)
 {
+    auto &dealerHand = hands.back();
     int dealerScore = dealerHand.evaluateScore(true);
-    int player1Score = player1Hand.evaluateScore(false);
+    bool dealerBusted = dealerScore > 21;
 
-    if (dealerScore > 21) 
+    for (size_t i = 0; i < hands.size() - 1; ++i)
     {
-        std::cout << "The dealer busts. Player 1 wins." << endl;
-        return 1;
-    }
-    else if (player1Score > 21) 
-    {
-        std::cout << "Player 1 busts. The dealer wins." << endl;
-        return -1;
-    }
-    else if (dealerScore > player1Score) 
-    {
-        std::cout << "The dealer wins." << endl;
-        return -1;
-    }
-    else if (player1Score > dealerScore) 
-    {
-        std::cout << "Player 1 wins." << endl;
-        return 1;
-    }
-    else 
-    {
-        std::cout << "Push! It's a tie." << endl;
-        return 0;
-    }
+        int playerScore = hands[i].evaluateScore(false);
+        // Rest of the scoring logic goes here...
+        bool playerBusted = playerScore > 21;
 
+        if (playerBusted)
+        {
+            cout << hands[i].owner << " busts. The dealer wins." << endl;
+            stats.dealerWins++;
+        }
+        else if (dealerBusted || playerScore > dealerScore)
+        {
+            cout << hands[i].owner << " wins." << endl;
+            stats.playerWins++;
+        }
+        else if (playerScore == dealerScore)
+        {
+            cout << "Push! It's a tie for " << hands[i].owner << "." << endl;
+            stats.ties++;
+        }
+        else
+        {
+            cout << "The dealer wins against " << hands[i].owner << "." << endl;
+            stats.dealerWins++;
+        }
+    }
+    return 0;
 }
-
-// Function to print the game statistics
-
-
 
 // Function to play a round of Blackjack
-void playRound(Deck& deck) 
+void playRound(Deck &deck, int numPlayers, GameStats &stats)
 {
-    // Initialize the game
-    deck.shuffleDeck();  // Shuffle the deck for a new round
-
-    // Create hands for the dealer and player and deal the initial cards
-    auto [dealerHand, player1Hand] = createHands(); 
-    dealCards(dealerHand, player1Hand, deck);
-
-    // prin the hands and check for blackjack
-    printAllHands(dealerHand, player1Hand, false); 
-    checkBlackjack(dealerHand, player1Hand); 
-
-    // Player's turn
-    bool playerTurn = true;
-
-    // loop to allow the player to hit or stand, exit if the player busts or stands
-    while (playerTurn && player1Hand.evaluateScore(false) < 21) 
+    // Create hands for all players and the dealer
+    vector<Hand> hands = createHands(numPlayers);
+    // Deal the initial two cards
+    dealCards(hands, deck);
+    // Check for Blackjack condition
+    if (!checkBlackjack(hands))
     {
-        playerTurn = hitOrStand(player1Hand, deck); // Hit or Stand
-        player1Hand.toString();
-    }
+        // Player turns
+        for (size_t i = 0; i < hands.size() - 1; ++i)
+        {
+            bool playerTurn = true;
+            while (playerTurn && hands[i].evaluateScore(false) <= 21)
+            {
+                printAllHands(hands, false);
+                playerTurn = hitOrStand(hands[i], deck);
+            }
+        }
 
-    // DEBUG: Print the player's hand and score
-   // std::cout << "DEBUG: Player 1's Score: " << player1Hand.evaluateScore(false) << endl;
-
-    // Dealer's turn (hit until score is 17 or higher)
-    while (dealerHand.evaluateScore(true) < 17) 
-    {
-        dealerHand = dealCard(dealerHand, deck);
+        // Dealer's turn
+        auto &dealerHand = hands.back();
+        while (dealerHand.evaluateScore(true) < 17)
+        {
+            dealerHand.addCard(deck.drawCard());
+        }
     }
-    // Reveal dealer's hand
-    printDealerHand(dealerHand, true); 
-    dealerHand.toString();
+    printAllHands(hands, true); // Reveal the dealer's hole card
 
-    // DEBUG: Print the dealer's hand and score
-   // std::cout << "DEBUG: Dealer's Score: " << dealerHand.evaluateScore(true) << endl;
-    
-    
-    // Determine the winner of the round
-    int winner = determineWinner(dealerHand, player1Hand);
-    // Print the winner and update the game statistics
-    if (winner == 1) 
-    {
-        std::cout << "Jackpot! Looks like luck is on your side!" << endl;
-        stats.playerWins++;
-
-    } else if (winner == -1) 
-    {
-        std::cout << "The house wins this round, but don't fold yet!!" << endl;
-        stats.dealerWins++;
-    }
-    else 
-    { 
-        std::cout << "Both sides holding strong!" << endl;
-        stats.ties++;
-    }
+    // Determine and print the winner
+    determineWinner(hands, stats);
     stats.printStats();
 
+    // Reveal all hands at the end of the round
 }
 
-
-
 //* ======= MAIN ======= *//
- // TODO: Additional  logic for other players 
 
-
-int main() 
+int main()
 {
-
     srand(time(0));
     bool playAgain = true;
     Deck deck;
-
-   while(playAgain)
-   {
-    playRound(deck);
-
-        //replay option
-        std::cout << "Would you like to play again? (yes/no) ";
-        std::string playAgain_answer;
-        std::cin >> playAgain_answer;
+    // Welcome message and prompt for number of players
+    cout << "Welcome to Blackjack! How many players are there? (1-3): ";
+    int numPlayers;
+    cin >> numPlayers;
+    // Initialize game statistics
+    GameStats stats;
+    // Play a round
+    while (playAgain)
+    {
+        playRound(deck, numPlayers, stats);
+        // Replay option
+        cout << "Would you like to play again? (yes/no) ";
+        string playAgain_answer;
+        cin >> playAgain_answer;
         playAgain = (playAgain_answer == "yes" || playAgain_answer == "y");
-   }
+    }
 
     return 0;
-
-
-} // end main
+}
