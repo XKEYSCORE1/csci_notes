@@ -6,6 +6,9 @@
 #include <iterator>
 #include <map>
 #include <utility>
+#include <vector>
+#include<chrono>
+#include<thread>
 
 using namespace std;
 
@@ -93,9 +96,19 @@ struct Hand
 struct GameStats
 {
 	vector<int> playerWins;																// number of wins for each player
-	int dealerWins = 0;																	// number of wins for the dealer
+	vector<int>playerLosses; 															// number of losses for each player
 	vector<int> playerTies;																// number of ties for each player
-	GameStats(int numPlayers) : playerWins(numPlayers, 0), playerTies(numPlayers, 0) {} // Constructor to initialize the game statistics (Parameters: numPlayers)
+	vector<int> playerBlackjacks;														// number of Blackjacks for each player
+	vector<int> playerBusts;															// number of busts for each player
+	int dealerWins = 0;																	// number of wins for the dealer
+	int dealerBlackjacks = 0;															// number of Blackjacks for the dealer
+	int totalRounds = 1;																// total number of rounds played (initialized to 1)
+
+	GameStats(int numPlayers) : 														// Constructor to initialize the game statistics (Parameters: numPlayers)
+		playerWins(numPlayers, 0), playerLosses(numPlayers, 0),
+		playerTies(numPlayers, 0), playerBusts(numPlayers, 0), 
+		playerBlackjacks(numPlayers, 0) {} 
+
 	void printStats(int numPlayers) const;												// Displays current game statistics
 };
 
@@ -188,6 +201,17 @@ bool hitOrStand(Hand &playerHand, const Hand &dealerHand, Shoe &deck);
  * @return Always returns 0 as a signal of normal function completion.
  */
 int determineWinner(vector<Hand> &hands, GameStats &stats, int numPlayers);
+
+/**
+ * @brief Collects all cards from the hands back to the shoe for the next round.
+ * 
+ * @details Resets the number of cards in each hand, shuffles the deck, and resets the current card index.
+ * 		Used to prepare for the next round and ensure a fair game.
+ *
+ * @param hands Vector containing 'Hand' objects for all players and the dealer.
+ * @param deck Reference to the deck housed in the shoe for collecting the cards.
+ */
+void collectCards(vector<Hand> &hands, Shoe &deck);
 
 /**
  * @brief Manages a single round of Blackjack.
@@ -283,7 +307,7 @@ void Shoe::shuffleDecks()
 		int randomIndex = rand() % (DECK_SIZE * NUMBER_OF_DECKS);
 		swap(cards[i], cards[randomIndex]);
 	}
-	std::cout << "Shuffling the deck..." << endl;
+	std::cout << "\nShuffling the deck...\n" << endl;
 }
 
 Shoe::Shoe()
@@ -424,14 +448,24 @@ int Hand::evaluateHandScore() const
 
 // Prints the current game statistics including wins, losses, and ties
 // Provides a summary of the game's progress
-void GameStats::printStats(int numPlayers) const
-{
-	std::cout << fixed << setprecision(2);
-	for (int i = 0; i < numPlayers; ++i)
-	{
-		std::cout << "Player " << (i + 1) << " Wins: " << playerWins[i] << " | Ties: " << playerTies[i] << endl;
-	}
-	std::cout << "Dealer Wins: " << dealerWins << endl;
+void GameStats::printStats(int numPlayers) const {
+    std::cout << fixed << setprecision(2);
+// calculate win, loss, and tie percentages
+    for (int i = 0; i < numPlayers; ++i) {
+        double winPercent = totalRounds > 0 ? (static_cast<double>(playerWins[i]) / totalRounds) * 100 : 0;
+        double lossPercent = totalRounds > 0 ? (static_cast<double>(playerLosses[i]) / totalRounds) * 100 : 0;
+        double tiePercent = totalRounds > 0 ? (static_cast<double>(playerTies[i]) / totalRounds) * 100 : 0;
+// print player statistics
+        std::cout << "Player " << (i + 1) << " - Wins: " << playerWins[i] << " (" << winPercent << "%), "
+                  << "Losses: " << playerLosses[i] << " (" << lossPercent << "%), "
+                  << "Ties: " << playerTies[i] << " (" << tiePercent << "%), "
+                  << "Blackjacks: " << playerBlackjacks[i] << ", "
+                  << "Busts: " << playerBusts[i] << std::endl;
+    }
+// calculate dealer win percentage
+    double dealerWinPercent = totalRounds > 0 ? (static_cast<double>(dealerWins) / totalRounds) * 100 : 0;
+    std::cout << "Dealer - Wins: " << dealerWins << " (" << dealerWinPercent << "%), "
+              << "Blackjacks: " << dealerBlackjacks << std::endl;
 }
 
 /* ========DEFINE GAME FUNCTIONS======= */
@@ -501,6 +535,7 @@ void dealCards(vector<Hand> &hands, Shoe &deck)
 		for (Hand &hand : hands)
 		{
 			drawFromShoe(hand, deck); // Deal one card to each hand
+			std::cout << hand.owner << " was dealt a card." << "(Cards in hand: " << (hands.size()/2) << ")" << endl;
 		}
 	}
 }
@@ -543,7 +578,7 @@ bool checkBlackjack(const vector<Hand> &hands, GameStats &stats, int numPlayers)
     for (size_t i = 0; i < hands.size() - 1; ++i) {
         int playerScore = hands[i].evaluateHandScore();
         if (playerScore == BLACKJACK) {
-            anyBlackjack = true;
+            anyBlackjack = true; // set flag if any player has Blackjack
             if (!dealerBlackjack) {
                 stats.playerWins[i]++;
                 std::cout << hands[i].owner << " has Blackjack and wins!" << std::endl;
@@ -558,7 +593,7 @@ bool checkBlackjack(const vector<Hand> &hands, GameStats &stats, int numPlayers)
     }
     if (dealerBlackjack) {
         stats.printStats(numPlayers);
-        return true;
+        return true; // return early if dealer has Blackjack
     }
     return anyBlackjack;
 }
@@ -623,12 +658,21 @@ int determineWinner(vector<Hand> &hands, GameStats &stats, int numPlayers) {
     int dealerScore = dealerHand.evaluateHandScore();
     bool dealerBusted = dealerScore > BLACKJACK;
 
+    // Check if dealer has blackjack
+    if (dealerScore == BLACKJACK && dealerHand.numCards == 2) {
+        stats.dealerBlackjacks++;
+    }
+
     for (size_t i = 0; i < hands.size() - 1; ++i) {
         int playerScore = hands[i].evaluateHandScore();
         bool playerBusted = playerScore > BLACKJACK;
 
         if (playerBusted) {
+            stats.playerLosses[i]++;
+            stats.playerBusts[i]++;
             std::cout << hands[i].owner << " busted!" << endl;
+        } else if (playerScore == BLACKJACK && hands[i].numCards == 2) {
+            stats.playerBlackjacks[i]++;
         } else if (dealerBusted || playerScore > dealerScore) {
             stats.playerWins[i]++;
             std::cout << hands[i].owner << " wins!" << endl;
@@ -636,12 +680,32 @@ int determineWinner(vector<Hand> &hands, GameStats &stats, int numPlayers) {
             stats.playerTies[i]++;
             std::cout << "Push! It's a tie for " << hands[i].owner << "." << endl;
         } else {
-            stats.dealerWins++;
+            stats.playerLosses[i]++;
             std::cout << hands[i].owner << " loses." << endl;
         }
     }
+
+    if (dealerBusted) {
+        for (auto &player : stats.playerWins) {
+            player++;
+        }
+    }
+
+    stats.totalRounds++;
     stats.printStats(numPlayers);
     return 0;
+}
+
+void collectCards(vector<Hand> &hands, Shoe &deck)
+{
+	std::cout << "Collecting cards back to the shoe..." << std::endl;
+
+	for (Hand &hand : hands)
+	{
+		hand.numCards = 0; // reset the number of cards in the hand
+	}
+	deck.currentCard = 0; // reset the current card index
+	deck.shuffleDecks();	// shuffle the deck
 }
 
 // Manages the flow of a single round of Blackjack
@@ -669,5 +733,6 @@ void playRound(Shoe &deck, int numPlayers, GameStats &stats)
 
 		printHands(hands, true);
 		determineWinner(hands, stats, numPlayers);
+		collectCards(hands, deck);
 	}
 }
