@@ -9,6 +9,8 @@
 			"iostream": "cpp",
 			"ostream": "cpp",
 			"vector": "cpp"
-		}
+		},
+		"better-comments.highlightPlainText": true,
+		"C_Cpp.doxygen.generatedStyle": "/**"
 	}
 }
